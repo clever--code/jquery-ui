@@ -203,7 +203,7 @@ $.widget( "ui.tooltip", {
 	},
 
 	_open: function( event, target, content ) {
-		var tooltip, positionOption;
+		var tooltip, positionOption, events;
 		if ( !content ) {
 			return;
 		}
@@ -258,9 +258,7 @@ $.widget( "ui.tooltip", {
 
 		this._trigger( "open", event, { tooltip: tooltip } );
 
-		this._on( target, {
-			mouseleave: "close",
-			focusout: "close",
+		events = {
 			keyup: function( event ) {
 				if ( event.keyCode === $.ui.keyCode.ESCAPE ) {
 					var fakeEvent = $.Event(event);
@@ -268,7 +266,14 @@ $.widget( "ui.tooltip", {
 					this.close( fakeEvent, true );
 				}
 			}
-		});
+		};
+		if ( !event || event.type === "mouseover" ) {
+			events.mouseleave = "close";
+		}
+		if ( !event || event.type === "focusin" ) {
+			events.focusout = "close";
+		}
+		this._on( target, events );
 	},
 
 	close: function( event, force ) {
